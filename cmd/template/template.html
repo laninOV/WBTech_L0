@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Show Order Info</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: "Helvetica", Arial, sans-serif;
+            background-color: #8a8585;
+        }
+        h1 {
+            color: #281919;
+        }
+        .order-form {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .show-order-button {
+            background-color: #8a4d85;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px 2px;
+            cursor: pointer;
+            font-family: "Helvetica", Arial, sans-serif;
+        }
+        .show-order-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<h1>Show Order Info</h1>
+<div class="order-form">
+    <label for="orderUID">Enter Order UID:</label>
+    <input type="text" id="orderUID" style="width: 100%;">
+    <button class="show-order-button" onclick="fetchOrderFromAPI()">Show Order</button>
+</div>
+
+<div id="orderDetails">
+    <!-- Order details will be displayed here -->
+</div>
+
+<script>
+    function fetchOrderFromAPI() {
+        var orderUID = document.getElementById('orderUID').value;
+
+        console.log(orderUID);
+        fetch(`/api/getOrderInfo/${orderUID}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Order not found');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var orderDetails = `
+                    <h2>Order Details</h2>
+                    <table>
+                        <tr>
+                            <th>Order UID</th>
+                            <td>${data.order_uid}</td>
+                        </tr>
+                        <tr>
+                            <th>Track number</th>
+                            <td>${data.track_number}</td>
+                        </tr>
+                        <tr>
+                            <th>Locale</th>
+                            <td>${data.locale}</td>
+                        </tr>
+                        <tr>
+                            <th>Customer id</th>
+                            <td>${data.customer_id}</td>
+                        </tr>
+                        <tr>
+                            <th>Date Created</th>
+                            <td>${data.date_created}</td>
+                        </tr>
+                        <tr>
+                            <th>Address</th>
+                            <td>${data.delivery.address}</td>
+                        </tr>
+                    </table>
+                `;
+                document.getElementById('orderDetails').innerHTML = orderDetails;
+            })
+            .catch(error => {
+                // Handle errors, e.g., display an error message
+                document.getElementById('orderDetails').innerHTML = `<p>${error.message}</p>`;
+            });
+    }
+</script>
+</body>
+</html>
